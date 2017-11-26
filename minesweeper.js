@@ -2,18 +2,13 @@ document.addEventListener('DOMContentLoaded', startGame)
 
 // Define your `board` object here!
 var board = {
-  "cells" : [{"row": 0, "col": 0, isMine: false, hidden: true},
-            {"row": 0, "col":1, isMine: false, hidden: true}, 
-            {"row": 0, "col":2, isMine: false, hidden: true},
-            {"row": 1, "col":0, isMine: true, hidden: true}, 
-            {"row": 1, "col":1, isMine: false, hidden: true}, 
-            {"row": 1, "col":2, isMine: true, hidden: true},
-            {"row": 2, "col":0, isMine: false, hidden: true}, 
-            {"row": 2, "col":1, isMine: false, hidden: true}, 
-            {"row": 2, "col":2, isMine: false, hidden: true}]
+  "cells" : []
 }
 
 function startGame () {
+
+  generateBoard(6);
+
   for(i = 0; i < board.cells.length; i++) {
     let cell = board.cells[i];
     cell["surroundingMines"] = countSurroundingMines(cell);
@@ -92,4 +87,47 @@ function countSurroundingMines (cell) {
   return count;
 }
 
+
+/// automatically generate the board
+function generateBoard(size) {
+  if (size < 3) {
+    size = 3;
+  }
+
+  // layout cell without mines
+  for (row = 0; row < size; row++) {
+    for (col = 0; col < size; col++) {
+        let cell = {
+          "row": row,
+          "col": col, 
+          isMine: false, 
+          hidden: true,
+        }
+        board.cells.push(cell);
+    }
+  }
+
+  plantMines();
+
+}
+
+// Given a list of cells, plant the mines
+function plantMines() {
+
+  if (board.cells.length == 0) {
+    return;
+  }
+
+  let totalCells = board.cells.length
+  let totalMines = Math.ceil(totalCells * 0.2); // 20% of cells have mines
+
+  while (totalMines > 0) {
+    let location = Math.floor(Math.random() * totalCells)
+    if (board.cells[location].isMine == false) {
+      board.cells[location].isMine = true;
+      totalMines -= 1;
+    }
+  }
+
+}
 
