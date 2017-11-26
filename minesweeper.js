@@ -9,17 +9,18 @@ function startGame () {
 
   generateBoard(6);
 
-  for(i = 0; i < board.cells.length; i++) {
-    let cell = board.cells[i];
-    cell["surroundingMines"] = countSurroundingMines(cell);
-  }
-
   // Add event listener
   document.addEventListener("click", checkForWin);
   document.addEventListener("contextmenu", checkForWin);
 
+  // Add button click listener
+  document.getElementById('resetButton').onclick = function () {
+    console.log("Reset button is clicked");
+  }
+
   // Don't remove this function call: it makes the game work!
   lib.initBoard()
+
 }
 
 // Define this function to look for a win condition:
@@ -53,11 +54,9 @@ function checkForWin (evt) {
   }
 
   if (!win) {
-    console.log("not yet win");
     return;
   }
 
-  console.log("Win!");
   // You can use this function call to declare a winner (once you've
   // detected that they've won, that is!)
   lib.displayMessage('You win!')
@@ -108,12 +107,21 @@ function generateBoard(size) {
   }
 
   plantMines();
+  showSurroundingMines()
 
 }
 
+
+/// show surround mines
+function showSurroundingMines() {
+  for(i = 0; i < board.cells.length; i++) {
+    let cell = board.cells[i];
+    cell["surroundingMines"] = countSurroundingMines(cell);
+  }
+} 
+
 // Given a list of cells, plant the mines
 function plantMines() {
-
   if (board.cells.length == 0) {
     return;
   }
