@@ -1,14 +1,16 @@
+'use strict';
+
 document.addEventListener('DOMContentLoaded', startGame)
 
 // Define your `board` object here!
 var board = {}
+var boardDimension = 5;
+var initialTime;
+var timeInterval; // time since game start
+var timerStarted = false;
 
+// Main entry point for the game
 function startGame() {
-
-  // Add event listener
-  document.addEventListener("click", checkForWin);
-  document.addEventListener("contextmenu", checkForWin);
-  document.addEventListener("contextmenu", showUnmarkedMines);
 
   // Add button click listener
   document.getElementById('resetButton').onclick = newGame;
@@ -17,18 +19,45 @@ function startGame() {
 
 }
 
+// Generate new game with everything reset
 function newGame() {
 
   console.log('new game');
-  var boardNode = document.getElementsByClassName('board')[0];
-  boardNode.innerHTML = ''; // reset visual;
+  resetTimer(); // 
+  resetBoard();
 
-  generateBoard(6);
-  showUnmarkedMines();
+  generateBoard(boardDimension);
+  showNumUnmarkedMines();
+  setupEventListener();
 
   // Don't remove this function call: it makes the game work!
   lib.initBoard()
 
+}
+
+
+function resetBoard() {
+  var boardNode = document.getElementsByClassName('board')[0];
+
+  // reset visual;
+  boardNode.innerHTML = '';
+
+  // remove event listeners
+  var clone = boardNode.cloneNode(true)
+  boardNode.parentNode.replaceChild(clone, boardNode)
+}
+
+
+// Initial setup of event listener
+function setupEventListener() {
+
+  var boardNode = document.getElementsByClassName('board')[0]
+  boardNode.addEventListener("click", checkForWin);
+  boardNode.addEventListener("contextmenu", checkForWin);
+  boardNode.addEventListener("contextmenu", showNumUnmarkedMines);
+  boardNode.addEventListener("click", startTimer);
+  boardNode.addEventListener("contextmenu", startTimer);
+  boardNode.addEventListener("click", stopTimer);
 }
 
 // Define this function to look for a win condition:
@@ -36,14 +65,13 @@ function newGame() {
 // 1. Are all of the cells that are NOT mines visible?
 // 2. Are all of the mines marked?
 function checkForWin(evt) {
-
   if (evt.button == 2) { // right mouse click
     evt.preventDefault();
   }
 
   let win = true;
 
-  for (i = 0; i < board.cells.length; i++) {
+  for (let i = 0; i < board.cells.length; i++) {
     let cell = board.cells[i];
 
     if (cell.isMarked) {
@@ -67,20 +95,85 @@ function checkForWin(evt) {
 
   // You can use this function call to declare a winner (once you've
   // detected that they've won, that is!)
+  clearInterval(timeInterval)
   lib.displayMessage('You win!')
 }
 
-// Show unmarked mines at top left of the scoreboard
-function showUnmarkedMines(evt) {
+// Show number of unmarked mines at top left of the scoreboard
+function showNumUnmarkedMines(evt) {
+  if (evt != undefined && evt.button == 2) { // right mouse click
+    evt.preventDefault();
+  }
+
   let marked = 0;
-  Array.from(board.cells).forEach( function (cell) {
+  Array.from(board.cells).forEach(function (cell) {
     if (cell.isMarked) {
       marked += 1;
     }
   });
 
   let remaining = getTotalMines() - marked;
-  document.getElementById('bombRemaining').innerHTML = remaining.toString();   
+  document.getElementById('bombRemaining').innerHTML = remaining.toString();
+}
+
+function resetTimer() {
+  clearInterval(timeInterval);
+  timerStarted = false;
+  document.getElementById("timer").innerHTML = "00:00";
+}
+
+//  Show count up ticking of the timer at the top right of the scoreboard
+function showTimerTicking() {
+  let timeNow = new Date().getTime();
+  let timeDiff = Math.floor((timeNow - initialTime) / 1000);
+  document.getElementById("timer").innerHTML = getMinSecStr(timeDiff);
+}
+
+// Given the number of seconds, return min::sec format
+function getMinSecStr(givenSeconds) {
+  let sec = givenSeconds % 60;
+  let min = Math.floor(givenSeconds / 60);
+
+  let secStr = sec.toString();
+  if (sec < 10) {
+    secStr = "0" + secStr;
+  }
+
+  let minStr = min.toString();
+  if (min < 10) {
+    minStr = "0" + minStr;
+  }
+
+  return minStr + ":" + secStr;
+}
+
+// Start the timer that refresh at every seconds,
+// when any cell is clicked first time
+function startTimer(evt) {
+  if (evt.button == 2) { // right mouse click
+    evt.preventDefault();
+  }
+
+  if (timerStarted) return;
+
+  var idx = getCellIndex(getRow(evt.target), getCol(evt.target))
+  if (idx == null) return;
+
+  initialTime = new Date().getTime();
+  timeInterval = setInterval(showTimerTicking, 1000);
+
+  timerStarted = true;
+}
+
+// Stop the timer losing is detected
+function stopTimer(evt) {
+  var idx = getCellIndex(getRow(evt.target), getCol(evt.target))
+  if (idx == null) return;
+
+  if (board.cells[idx].isMine) {
+    clearInterval(timeInterval);
+  }
+
 }
 
 
@@ -109,16 +202,16 @@ function countSurroundingMines(cell) {
 
 
 /// automatically generate the board
-function generateBoard(size) {
-  if (size < 3) {
-    size = 3;
+function generateBoard(dimension) {
+  if (dimension < 3) {
+    dimension = 3;
   }
 
-  board.cells = [];  // Reset cells
+  board.cells = []; // Reset cells
 
   // layout cell without mines
-  for (row = 0; row < size; row++) {
-    for (col = 0; col < size; col++) {
+  for (let row = 0; row < dimension; row++) {
+    for (let col = 0; col < dimension; col++) {
       let cell = {
         "row": row,
         "col": col,
@@ -137,7 +230,7 @@ function generateBoard(size) {
 
 /// show surround mines
 function showSurroundingMines() {
-  for (i = 0; i < board.cells.length; i++) {
+  for (let i = 0; i < board.cells.length; i++) {
     let cell = board.cells[i];
     cell["surroundingMines"] = countSurroundingMines(cell);
   }
