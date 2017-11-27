@@ -15,6 +15,9 @@ function startGame() {
   // Add button click listener
   document.getElementById('resetButton').onclick = newGame;
 
+  // Add difficulty change listener
+  document.getElementById("difficultyLevel").onchange = newGame;
+
   newGame();
 
 }
@@ -27,7 +30,6 @@ function newGame() {
   resetBoard();
 
   boardDimension = document.getElementById("difficultyLevel").value;
-
 
   generateBoard(boardDimension);
   showNumUnmarkedMines();
