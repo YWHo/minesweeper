@@ -178,7 +178,7 @@ function stopTimer(evt) {
 
   if (board.cells[idx].isMine) {
     clearInterval(timeInterval);
-    document.getElementById("booSound").play();
+    document.getElementById("bombSound").play();
   }
 
 }
