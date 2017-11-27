@@ -26,6 +26,9 @@ function newGame() {
   resetTimer(); // 
   resetBoard();
 
+  boardDimension = document.getElementById("difficultyLevel").value;
+
+
   generateBoard(boardDimension);
   showNumUnmarkedMines();
   setupEventListener();
