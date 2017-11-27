@@ -8,6 +8,7 @@ function startGame() {
   // Add event listener
   document.addEventListener("click", checkForWin);
   document.addEventListener("contextmenu", checkForWin);
+  document.addEventListener("contextmenu", showUnmarkedMines);
 
   // Add button click listener
   document.getElementById('resetButton').onclick = newGame;
@@ -22,7 +23,8 @@ function newGame() {
   var boardNode = document.getElementsByClassName('board')[0];
   boardNode.innerHTML = ''; // reset visual;
 
-  generateBoard(5);
+  generateBoard(6);
+  showUnmarkedMines();
 
   // Don't remove this function call: it makes the game work!
   lib.initBoard()
@@ -66,6 +68,19 @@ function checkForWin(evt) {
   // You can use this function call to declare a winner (once you've
   // detected that they've won, that is!)
   lib.displayMessage('You win!')
+}
+
+// Show unmarked mines at top left of the scoreboard
+function showUnmarkedMines(evt) {
+  let marked = 0;
+  Array.from(board.cells).forEach( function (cell) {
+    if (cell.isMarked) {
+      marked += 1;
+    }
+  });
+
+  let remaining = getTotalMines() - marked;
+  document.getElementById('bombRemaining').innerHTML = remaining.toString();   
 }
 
 
@@ -136,6 +151,7 @@ function plantMines() {
 
   let totalCells = board.cells.length
   let totalMines = Math.ceil(totalCells * 0.2); // 20% of cells have mines
+  setTotalMines(totalMines);
 
   while (totalMines > 0) {
     let location = Math.floor(Math.random() * totalCells)
@@ -145,4 +161,16 @@ function plantMines() {
     }
   }
 
+}
+
+function setTotalMines(num) {
+  board.totalMines = num;
+}
+
+function getTotalMines() {
+  if (board.hasOwnProperty("totalMines") && board.totalMines > 0) {
+    return board.totalMines;
+  } else {
+    return 0;
+  }
 }
