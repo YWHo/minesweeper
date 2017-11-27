@@ -1,22 +1,28 @@
 document.addEventListener('DOMContentLoaded', startGame)
 
 // Define your `board` object here!
-var board = {
-  "cells" : []
-}
+var board = {}
 
-function startGame () {
-
-  generateBoard(6);
+function startGame() {
 
   // Add event listener
   document.addEventListener("click", checkForWin);
   document.addEventListener("contextmenu", checkForWin);
 
   // Add button click listener
-  document.getElementById('resetButton').onclick = function () {
-    console.log("Reset button is clicked");
-  }
+  document.getElementById('resetButton').onclick = newGame;
+
+  newGame();
+
+}
+
+function newGame() {
+
+  console.log('new game');
+  var boardNode = document.getElementsByClassName('board')[0];
+  boardNode.innerHTML = ''; // reset visual;
+
+  generateBoard(5);
 
   // Don't remove this function call: it makes the game work!
   lib.initBoard()
@@ -27,7 +33,7 @@ function startGame () {
 //
 // 1. Are all of the cells that are NOT mines visible?
 // 2. Are all of the mines marked?
-function checkForWin (evt) {
+function checkForWin(evt) {
 
   if (evt.button == 2) { // right mouse click
     evt.preventDefault();
@@ -35,7 +41,7 @@ function checkForWin (evt) {
 
   let win = true;
 
-  for(i = 0; i < board.cells.length; i++) {
+  for (i = 0; i < board.cells.length; i++) {
     let cell = board.cells[i];
 
     if (cell.isMarked) {
@@ -71,17 +77,17 @@ function checkForWin (evt) {
 //
 // It will return cell objects in an array. You should loop through 
 // them, counting the number of times `cell.isMine` is true.
-function countSurroundingMines (cell) {
+function countSurroundingMines(cell) {
   var surroundingCells = lib.getSurroundingCells(cell.row, cell.col)
   var count = 0
 
   if (Array.isArray(surroundingCells)) {
-    Array.from(surroundingCells).forEach( function(aCell) {
+    Array.from(surroundingCells).forEach(function (aCell) {
       if (aCell.isMine) {
         count += 1
       }
     });
-    
+
   }
   return count;
 }
@@ -93,16 +99,18 @@ function generateBoard(size) {
     size = 3;
   }
 
+  board.cells = [];  // Reset cells
+
   // layout cell without mines
   for (row = 0; row < size; row++) {
     for (col = 0; col < size; col++) {
-        let cell = {
-          "row": row,
-          "col": col, 
-          isMine: false, 
-          hidden: true,
-        }
-        board.cells.push(cell);
+      let cell = {
+        "row": row,
+        "col": col,
+        isMine: false,
+        hidden: true,
+      }
+      board.cells.push(cell);
     }
   }
 
@@ -114,11 +122,11 @@ function generateBoard(size) {
 
 /// show surround mines
 function showSurroundingMines() {
-  for(i = 0; i < board.cells.length; i++) {
+  for (i = 0; i < board.cells.length; i++) {
     let cell = board.cells[i];
     cell["surroundingMines"] = countSurroundingMines(cell);
   }
-} 
+}
 
 // Given a list of cells, plant the mines
 function plantMines() {
@@ -138,4 +146,3 @@ function plantMines() {
   }
 
 }
-
