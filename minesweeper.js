@@ -97,6 +97,7 @@ function checkForWin(evt) {
   // detected that they've won, that is!)
   clearInterval(timeInterval)
   lib.displayMessage('You win!')
+  document.getElementById("cheerSound").play();
 }
 
 // Show number of unmarked mines at top left of the scoreboard
@@ -172,6 +173,7 @@ function stopTimer(evt) {
 
   if (board.cells[idx].isMine) {
     clearInterval(timeInterval);
+    document.getElementById("booSound").play();
   }
 
 }
