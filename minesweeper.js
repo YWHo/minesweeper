@@ -91,6 +91,11 @@ function checkForWin(evt) {
       // still got hidden cells
       win = false;
       break;
+    } else if (cell.isMine) {
+      // Not marked and not hidden, but a mine
+      // user clicked on the mine!!
+      win = false;
+      break;
     }
   }
 
