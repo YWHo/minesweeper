@@ -74,34 +74,20 @@ function checkForWin(evt) {
     evt.preventDefault();
   }
 
-  let win = true;
-
   for (let i = 0; i < board.cells.length; i++) {
     let cell = board.cells[i];
 
-    if (cell.isMarked) {
-      if (cell.isMine) {
-        // all good, do nothing
-      } else {
-        // the mine is wrongly marked
-        win = false;
-        break;
-      }
-    } else if (cell.hidden) {
-      // still got hidden cells
-      win = false;
-      break;
-    } else if (cell.isMine) {
-      // Not marked and not hidden, but a mine
-      // user clicked on the mine!!
-      win = false;
-      break;
+    if (cell.isMine && !cell.isMarked) {
+      return;
     }
+
+    if (!cell.isMine && cell.isHidden) {
+      return;
+    }
+    
   }
 
-  if (!win) {
-    return;
-  }
+  
 
   // You can use this function call to declare a winner (once you've
   // detected that they've won, that is!)
