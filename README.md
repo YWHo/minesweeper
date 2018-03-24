@@ -1,3 +1,6 @@
+# Link to completed minesweeper
+https://ywho.github.io/minesweeper/
+
 # Minesweeper
 
 This challenge has you create a clone of the desktop game Minesweeper:
